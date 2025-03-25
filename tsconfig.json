@@ -6,7 +6,9 @@
     "moduleResolution": "node",
     "strict": true,
     "jsx": "react",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true, // Tăng tốc độ biên dịch
+    "forceConsistentCasingInFileNames": true // Ngăn lỗi do phân biệt chữ hoa/thường
   },
   "include": [
     "src/**/*"

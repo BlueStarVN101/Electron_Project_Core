@@ -1,8 +1,8 @@
 const path = require('path');
 
 module.exports = {
-devtool: 'source-map', 
-  mode: 'development',
+  devtool: process.env.NODE_ENV === 'production' ? false : 'source-map', // Tắt source map trong production
+  mode: process.env.NODE_ENV || 'development', // Chọn chế độ dựa trên NODE_ENV
   entry: './src/renderer.tsx',
   module: {
     rules: [
