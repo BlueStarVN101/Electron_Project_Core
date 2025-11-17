@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import * as path from 'path';
 
+const electronExecutable = require('electron') as string;
 const repoRoot = path.resolve(__dirname, '..');
 const electronMainPath = path.resolve(repoRoot, 'dist/main/index.js');
 const testDir = path.resolve(__dirname, 'ui');
@@ -24,7 +25,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         launchOptions: {
           args: [electronMainPath],
-          executablePath: require('electron'),
+          executablePath: electronExecutable,
           env: { ...process.env, NODE_ENV: 'development' }
         }
       }

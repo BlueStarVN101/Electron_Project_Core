@@ -17,6 +17,9 @@ const installDevTools = async (): Promise<void> => {
   }
 };
 
+/**
+ * Create the main renderer window and wire up lifecycle events.
+ */
 const createMainWindow = async (): Promise<void> => {
   mainWindow = new BrowserWindow({
     width: 1280,
@@ -42,6 +45,9 @@ const createMainWindow = async (): Promise<void> => {
   }
 };
 
+/**
+ * Bootstraps the Electron app by installing DevTools (in dev) and creating the window.
+ */
 export const bootstrap = async (): Promise<void> => {
   if (isDev) {
     await installDevTools();
