@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, session } from 'electron';
 import * as path from 'path';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -10,8 +10,10 @@ const getHtmlPath = () => path.resolve(__dirname, '../../..', 'index.html');
 const installDevTools = async (): Promise<void> => {
   try {
     const { default: installExtension, REACT_DEVELOPER_TOOLS } = await import('electron-devtools-installer');
-    const name = await installExtension(REACT_DEVELOPER_TOOLS);
-    console.log(`Added Extension: ${name}`);
+    const extensionPath = await installExtension(REACT_DEVELOPER_TOOLS, false);
+    // Use the new API to load the extension
+    const extension = await session.defaultSession.extensions.loadExtension(extensionPath);
+    console.log(`Added Extension: ${extension.name}`);
   } catch (error) {
     console.error('Failed to install React DevTools:', error);
   }
