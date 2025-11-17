@@ -14,3 +14,4 @@ if (container) {
 } else {
   console.error('Failed to find the root element');
 }
+

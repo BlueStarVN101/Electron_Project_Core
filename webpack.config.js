@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
   devtool: process.env.NODE_ENV === 'production' ? false : 'source-map', 
   mode: process.env.NODE_ENV || 'development',
-  entry: './src/renderer.tsx',
+  entry: './src/renderer/app/renderer.tsx',
   module: {
     rules: [
       {

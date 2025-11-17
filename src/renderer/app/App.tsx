@@ -1,13 +1,8 @@
 import React from 'react';
-
-type VersionInfo = {
-  node: string;
-  chrome: string;
-  electron: string;
-};
+import type { RuntimeVersions } from '../../shared/models/runtime';
 
 const App = () => {
-  const [versions, setVersions] = React.useState<VersionInfo | null>(null);
+  const [versions, setVersions] = React.useState<RuntimeVersions | null>(null);
 
   React.useEffect(() => {
     const versionInfo = window.electronAPI?.getVersions();
@@ -19,8 +14,8 @@ const App = () => {
   return (
     <main style={{ fontFamily: 'system-ui, sans-serif', padding: 24 }}>
       <header>
-        <h1>All-in-one Electron starter</h1>
-        <p>You're now running a typed React renderer with a secure preload bridge</p>
+        <h1>All-in-one Electron starter.</h1>
+        <p>You're now running a typed React renderer with a secure preload bridge.</p>
       </header>
 
       <section>
@@ -35,7 +30,8 @@ const App = () => {
       <section>
         <h2>Next steps</h2>
         <p>
-          Start editing <code>src/App.tsx</code> or add new components under <code>src/</code>. The renderer will be rebuilt every time you run <code>npm run dev</code>.
+          Start editing <code>src/renderer/app/App.tsx</code> or add new components under <code>src/renderer/</code>. The renderer rebuilds automatically while{' '}
+          <code>npm run dev</code> is running.
         </p>
       </section>
     </main>
@@ -43,3 +39,4 @@ const App = () => {
 };
 
 export default App;
+

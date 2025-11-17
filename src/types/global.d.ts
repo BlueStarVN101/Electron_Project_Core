@@ -1,14 +1,10 @@
-export {};
+import type { RuntimeVersions } from '../shared/models/runtime';
 
-type VersionMap = {
-  node: string;
-  chrome: string;
-  electron: string;
-};
+export {};
 
 declare global {
   interface ElectronAPI {
-    getVersions: () => VersionMap;
+    getVersions: () => RuntimeVersions;
   }
 
   interface Window {

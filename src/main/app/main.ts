@@ -4,30 +4,8 @@ import * as path from 'path';
 const isDev = process.env.NODE_ENV === 'development';
 let mainWindow: BrowserWindow | null = null;
 
-const createMainWindow = async (): Promise<void> => {
-  mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 800,
-    show: false,
-    autoHideMenuBar: true,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true,
-      nodeIntegration: false
-    }
-  });
-
-  mainWindow.once('ready-to-show', () => mainWindow?.show());
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-
-  await mainWindow.loadFile(path.join(__dirname, '../index.html'));
-
-  if (isDev) {
-    mainWindow.webContents.openDevTools({ mode: 'detach' });
-  }
-};
+const getPreloadPath = () => path.join(__dirname, '../preload/index.js');
+const getHtmlPath = () => path.resolve(__dirname, '../../..', 'index.html');
 
 const installDevTools = async (): Promise<void> => {
   try {
@@ -39,7 +17,32 @@ const installDevTools = async (): Promise<void> => {
   }
 };
 
-const bootstrap = async (): Promise<void> => {
+const createMainWindow = async (): Promise<void> => {
+  mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    show: false,
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: getPreloadPath(),
+      contextIsolation: true,
+      nodeIntegration: false
+    }
+  });
+
+  mainWindow.once('ready-to-show', () => mainWindow?.show());
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
+
+  await mainWindow.loadFile(getHtmlPath());
+
+  if (isDev) {
+    mainWindow.webContents.openDevTools({ mode: 'detach' });
+  }
+};
+
+export const bootstrap = async (): Promise<void> => {
   if (isDev) {
     await installDevTools();
   }
@@ -47,19 +50,15 @@ const bootstrap = async (): Promise<void> => {
   await createMainWindow();
 };
 
-app.whenReady().then(bootstrap).catch((error) => {
-  console.error('Failed to bootstrap the application:', error);
-  app.quit();
-});
-
-app.on('activate', () => {
+export const handleActivate = (): void => {
   if (BrowserWindow.getAllWindows().length === 0) {
     void createMainWindow();
   }
-});
+};
 
-app.on('window-all-closed', () => {
+export const handleWindowAllClosed = (): void => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
-});
+};
+
