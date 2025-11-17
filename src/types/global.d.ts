@@ -1,12 +1,10 @@
 import type { RuntimeVersions } from '../shared/models/runtime';
 
-export {};
+export type ElectronAPI = {
+  getVersions: () => RuntimeVersions;
+};
 
 declare global {
-  interface ElectronAPI {
-    getVersions: () => RuntimeVersions;
-  }
-
   interface Window {
     electronAPI?: ElectronAPI;
   }

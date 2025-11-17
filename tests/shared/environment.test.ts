@@ -1,4 +1,4 @@
-import { isDevelopmentEnv, isProductionEnv } from '../environment';
+import { isDevelopmentEnv, isProductionEnv } from '../../src/shared/utils/environment';
 
 describe('environment utils', () => {
   it('detects development mode', () => {
