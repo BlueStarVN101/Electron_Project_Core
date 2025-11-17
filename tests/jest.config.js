@@ -10,7 +10,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
   testPathIgnorePatterns: ['<rootDir>/tests/ui/'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
-  coverageDirectory: 'coverage',
+  coverageDirectory: process.env.JEST_COVERAGE_DIR || 'tests/results/coverage',
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: path.resolve(__dirname, '../tsconfig.test.json') }]
   }

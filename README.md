@@ -45,7 +45,7 @@ An Electron + React + TypeScript starter that ships with secure preload bridges,
 - `npm run build:renderer` – Bundles the React renderer (`src/renderer/app/renderer.tsx`) with Webpack in development mode.
 - `npm run typecheck` – Runs the TypeScript compiler in `--noEmit` mode for faster feedback.
 - `npm test` – Executes Jest with `ts-jest`, producing coverage in `coverage/`.
-- `npm run test:ui` – Builds the app then runs Playwright-based Electron smoke tests.
+- `npm run test:ui` – Builds the app then runs Playwright-based Electron smoke tests (artifacts under `tests/results/`).
 - `npm run build` – Runs the production renderer build plus `tsc -p tsconfig.prod.json`.
 - `npm run dist` – Packages the app via `electron-builder` (requires `npm run build` first).
 
@@ -56,7 +56,7 @@ An Electron + React + TypeScript starter that ships with secure preload bridges,
 - `src/renderer/app/App.tsx` – React root component
 - `src/renderer/app/renderer.tsx` – React entry rendered by Webpack
 - `src/shared/models/**` – Types shared between main, preload, and renderer
-- `tests/**` – Centralized Jest specs (mirrors shared/renderer layers)
+- `tests/**` – Centralized Jest specs, Playwright configs, and `tests/results/**` artifacts
 - `webpack.config.js` – Renderer bundler configuration
 - `tsconfig*.json` – Shared / production TypeScript configs
 - `index.html` – Renderer HTML shell loaded by the main process

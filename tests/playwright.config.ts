@@ -4,6 +4,8 @@ import * as path from 'path';
 const repoRoot = path.resolve(__dirname, '..');
 const electronMainPath = path.resolve(repoRoot, 'dist/main/index.js');
 const testDir = path.resolve(__dirname, 'ui');
+const reportDir = process.env.PLAYWRIGHT_HTML_OUTPUT || path.resolve(repoRoot, 'tests/results/playwright-report');
+const testResultsDir = process.env.PLAYWRIGHT_TEST_RESULTS || path.resolve(repoRoot, 'tests/results/test-results');
 
 export default defineConfig({
   testDir,
@@ -28,6 +30,7 @@ export default defineConfig({
       }
     }
   ],
-  reporter: [['list'], ['html', { outputFolder: path.resolve(repoRoot, 'playwright-report') }]]
+  reporter: [['list'], ['html', { outputFolder: reportDir }]],
+  outputDir: testResultsDir
 });
 
