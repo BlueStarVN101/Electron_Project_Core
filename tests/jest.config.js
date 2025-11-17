@@ -13,6 +13,34 @@ module.exports = {
   coverageDirectory: 'coverage',
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: path.resolve(__dirname, '../tsconfig.test.json') }]
-  }
+  },
+  reporters: [
+    'default',
+    [
+      'jest-html-reporters',
+      {
+        publicPath: './test-results',
+        filename: 'test-report.html',
+        pageTitle: 'Unit Test Report',
+        openReport: false,
+        expand: true,
+        hideIcon: false,
+        includeFailureMsg: true,
+        includeSuiteFailure: true
+      }
+    ],
+    [
+      'jest-junit',
+      {
+        outputDirectory: './test-results',
+        outputName: 'junit.xml',
+        suiteName: 'Unit Tests',
+        classNameTemplate: '{classname}',
+        titleTemplate: '{title}',
+        ancestorSeparator: ' › ',
+        usePathForSuiteName: 'true'
+      }
+    ]
+  ]
 };
 
