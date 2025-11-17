@@ -10,9 +10,9 @@
     "build:main": "tsc --project tsconfig.json",
     "build:renderer": "cross-env NODE_ENV=development webpack --config webpack.config.js",
     "typecheck": "tsc --noEmit --pretty",
-    "test": "cross-env JEST_COVERAGE_DIR=tests/results/coverage jest --config tests/jest.config.js",
-    "test:coverage": "cross-env JEST_COVERAGE_DIR=tests/results/coverage jest --config tests/jest.config.js --coverage",
-    "test:ui": "npm run build && cross-env PLAYWRIGHT_HTML_OUTPUT=tests/results/playwright-report PLAYWRIGHT_TEST_RESULTS=tests/results/test-results playwright test --config tests/playwright.config.ts",
+    "test": "jest --config tests/jest.config.js",
+    "test:coverage": "jest --config tests/jest.config.js --coverage",
+    "test:ui": "npm run build && playwright test --config tests/playwright.config.ts",
     "build": "cross-env NODE_ENV=production webpack --config webpack.config.js && tsc -p tsconfig.prod.json",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
