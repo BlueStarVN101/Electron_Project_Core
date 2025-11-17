@@ -1,5 +1,15 @@
 import { contextBridge } from 'electron';
 
-contextBridge.exposeInMainWorld('api', {
-  sayHello: () => console.log('Hello from preload!')
+type VersionInfo = {
+  node: string;
+  chrome: string;
+  electron: string;
+};
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  getVersions: (): VersionInfo => ({
+    node: process.versions.node,
+    chrome: process.versions.chrome,
+    electron: process.versions.electron
+  })
 });
