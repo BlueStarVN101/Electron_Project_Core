@@ -24,12 +24,17 @@ An Electron + React + TypeScript starter that ships with secure preload bridges,
    npm run typecheck
    ```
 
-4. Produce production assets (`dist/`) and TypeScript output (`dist/main.js`, `dist/preload.js`)
+4. Run unit tests (Jest + ts-jest)
+   ```bash
+   npm test
+   ```
+
+5. Produce production assets (`dist/`) and TypeScript output (`dist/main.js`, `dist/preload.js`)
    ```bash
    npm run build
    ```
 
-5. Build distributables / installers
+6. Build distributables / installers
    ```bash
    npm run dist
    ```
@@ -39,6 +44,7 @@ An Electron + React + TypeScript starter that ships with secure preload bridges,
 - `npm run build:main` – Compiles everything under `src/main/**` (including preload) into `dist/main/**`.
 - `npm run build:renderer` – Bundles the React renderer (`src/renderer/app/renderer.tsx`) with Webpack in development mode.
 - `npm run typecheck` – Runs the TypeScript compiler in `--noEmit` mode for faster feedback.
+- `npm test` – Executes Jest with `ts-jest`, producing coverage in `coverage/`.
 - `npm run build` – Runs the production renderer build plus `tsc -p tsconfig.prod.json`.
 - `npm run dist` – Packages the app via `electron-builder` (requires `npm run build` first).
 
