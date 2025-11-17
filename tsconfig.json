@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "./src",
     "outDir": "./dist",
     "module": "commonjs",
     "target": "ES2021",
@@ -13,8 +14,11 @@
     "forceConsistentCasingInFileNames": true 
   },
   "include": [
-    "src/**/*",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "src/**/*"
+  ],
+  "exclude": [
+    "tests/**/*",
+    "node_modules",
+    "dist"
   ]
 }
