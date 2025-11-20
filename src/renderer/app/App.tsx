@@ -4,6 +4,8 @@ import type { DeviceInfo } from '../../shared/models/device';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { selectDevicesList, selectDevicesLoading, setDevices, setDevicesLoading } from './store/devices/devices.slice';
 import './App.css';
+import heroIllustration from '../assets/device-hero.png';
+import deviceBadge from '../assets/device-badge.svg';
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -56,6 +58,10 @@ const App = () => {
           <span className="eyebrow">Device orchestration</span>
           <h1>USB Device Control Center</h1>
           <p className="hero-subtitle">Monitor and moderate how each desktop instance interacts with shared USB hardware. Claim devices when you need them and release with a click.</p>
+          <div className="hero-art">
+            <img className="hero-art__badge" src={deviceBadge} alt="Stylized device badge" />
+            <img className="hero-art__illustration" src={heroIllustration} alt="Abstract device orchestration" />
+          </div>
         </div>
 
         <div className="stats-grid">
