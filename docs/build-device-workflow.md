@@ -69,3 +69,38 @@ sequenceDiagram
     end
 ```
 
+## System Overview Diagram
+```mermaid
+flowchart TD
+    subgraph Authoring
+        UI[React/Redux TSX + CSS]
+        MainTS[Electron main TS]
+        Tests[Jest + Playwright]
+    end
+
+    subgraph Tooling
+        Webpack[Webpack + Babel]
+        TSC[tsc (tsconfig.json/prod/test)]
+    end
+
+    subgraph Outputs
+        RendererBundle[dist/bundle.js + assets]
+        MainBundle[dist/main/**]
+        TestReports[tests/test-results/**]
+    end
+
+    subgraph Runtime
+        ElectronApp[Electron app]
+        DeviceStore[In-memory USB devices]
+        ReduxState[Redux store]
+    end
+
+    UI --> Webpack --> RendererBundle --> ElectronApp
+    MainTS --> TSC --> MainBundle --> ElectronApp
+    Tests -->|ts-jest & Playwright| Tooling --> TestReports
+
+    ElectronApp --> ReduxState
+    ElectronApp --> DeviceStore
+    ReduxState -->|feeds| DeviceTable[Device Table UI]
+```
+
