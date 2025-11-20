@@ -1,8 +1,11 @@
-import { app, BrowserWindow, session } from 'electron';
+import { app, BrowserWindow, ipcMain, session } from 'electron';
 import * as path from 'path';
+import InstanceCoordinator from './instance-coordinator';
+import type { InstanceState } from '../../shared/models/instance';
 
 const isDev = process.env.NODE_ENV === 'development';
 let mainWindow: BrowserWindow | null = null;
+let instanceCoordinator: InstanceCoordinator | null = null;
 
 const getPreloadPath = () => path.join(__dirname, '../preload/index.js');
 const getHtmlPath = () => path.resolve(__dirname, '../../..', 'index.html');
@@ -42,9 +45,28 @@ const createMainWindow = async (): Promise<void> => {
 
   await mainWindow.loadFile(getHtmlPath());
 
+  if (instanceCoordinator) {
+    const snapshot = await instanceCoordinator.getSnapshot();
+    mainWindow.webContents.send('instance:state', snapshot);
+  }
+
   if (isDev) {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
+};
+
+const registerInstanceHandlers = (coordinator: InstanceCoordinator): void => {
+  ipcMain.handle('instance:get-state', () => coordinator.getSnapshot());
+  ipcMain.handle('instance:claim-usb', () => coordinator.claimUsbDevice());
+  ipcMain.handle('instance:release-usb', () => coordinator.releaseUsbDevice());
+
+  coordinator.on('state-changed', (state: InstanceState) => {
+    if (mainWindow?.isDestroyed()) {
+      return;
+    }
+
+    mainWindow?.webContents.send('instance:state', state);
+  });
 };
 
 /**
@@ -53,6 +75,12 @@ const createMainWindow = async (): Promise<void> => {
 export const bootstrap = async (): Promise<void> => {
   if (isDev) {
     await installDevTools();
+  }
+
+  if (!instanceCoordinator) {
+    instanceCoordinator = new InstanceCoordinator(app.getName());
+    await instanceCoordinator.init();
+    registerInstanceHandlers(instanceCoordinator);
   }
 
   await createMainWindow();
@@ -69,4 +97,8 @@ export const handleWindowAllClosed = (): void => {
     app.quit();
   }
 };
+
+app.once('before-quit', () => {
+  instanceCoordinator?.dispose();
+});
 

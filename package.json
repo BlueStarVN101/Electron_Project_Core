@@ -69,6 +69,7 @@
   "dependencies": {
     "latest-version": "^9.0.0",
     "package-json": "^10.0.1",
+    "ps-list": "^9.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "update-notifier": "^7.3.1"
