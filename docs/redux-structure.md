@@ -71,3 +71,10 @@ export type AppDispatch = typeof store.dispatch;
 3. Redux replaces the slice with the broadcast payload, and React components rerender automatically.
 
 Because IPC usage is centralized in the renderer (no preload bridge), swapping in real hardware logic later only requires changes to `main.ts`.
+
+## Build/Test integration points
+
+- **Renderer compilation** – Webpack (`webpack.config.js`) uses `babel-loader` with `.babelrc` presets (`@babel/preset-react` + `@babel/preset-typescript`) to transform `.tsx` into the `dist/bundle.js` that Electron loads. CSS imports (`import './App.css'`) run through `css-loader` → `style-loader`.
+- **TypeScript configs** – `tsconfig.json` covers the main/preload build (`npm run build:main`) and type checking; `tsconfig.prod.json` tightens production builds; `tsconfig.test.json` keeps Jest lightweight (no Electron types).
+- **Jest** – `tests/jest.config.js` points `ts-jest` at `tsconfig.test.json` and maps CSS extensions to `identity-obj-proxy` so renderer components can be tested without real styles.
+- **Playwright** – `tests/playwright.config.ts` launches the compiled Electron app (`dist/main/index.js` + `dist/bundle.js`) and writes HTML results to `tests/test-results/playwright-report/`.
