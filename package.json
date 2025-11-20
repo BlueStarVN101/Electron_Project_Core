@@ -67,11 +67,12 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.10.1",
     "latest-version": "^9.0.0",
     "package-json": "^10.0.1",
-    "ps-list": "^9.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-redux": "^9.2.0",
     "update-notifier": "^7.3.1"
   },
   "overrides": {

@@ -1,56 +1,35 @@
 import React from 'react';
-import type { InstanceState } from '../../shared/models/instance';
-import type { RuntimeVersions } from '../../shared/models/runtime';
+import { ipcRenderer } from 'electron';
+import type { DeviceInfo } from '../../shared/models/device';
+import { useAppDispatch, useAppSelector } from './store/hooks';
+import { selectDevicesList, selectDevicesLoading, setDevices, setDevicesLoading } from './store/devices/devices.slice';
 
 const App = () => {
-  const [versions, setVersions] = React.useState<RuntimeVersions | null>(null);
-  const [instanceState, setInstanceState] = React.useState<InstanceState | null>(null);
-  const [usbMessages, setUsbMessages] = React.useState<Record<string, string>>({});
+  const dispatch = useAppDispatch();
+  const devices = useAppSelector(selectDevicesList);
+  const devicesLoading = useAppSelector(selectDevicesLoading);
 
-  // Fetch static runtime versions once on mount.
   React.useEffect(() => {
-    const versionInfo = window.electronAPI?.getVersions();
-    if (versionInfo) {
-      setVersions(versionInfo);
-    }
-  }, []);
-
-  // Listen for instance coordinator updates and populate the dashboard.
-  React.useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
-
-    const bootstrapInstanceState = async () => {
-      const state = await window.electronAPI?.getInstanceState();
-      if (state) {
-        setInstanceState(state);
-      }
-      unsubscribe = window.electronAPI?.onInstanceState((nextState) => {
-        setInstanceState(nextState);
-      });
+    // Kick off the initial device sync. The main process responds via `devices:update`
+    // and every subsequent update gets normalized through the Redux slice.
+    dispatch(setDevicesLoading(true));
+    const handler = (_event: Electron.IpcRendererEvent, devicesList: DeviceInfo[]) => {
+      dispatch(setDevices(devicesList));
     };
-
-    void bootstrapInstanceState();
+    ipcRenderer.on('devices:update', handler);
+    ipcRenderer.send('devices:request');
 
     return () => {
-      unsubscribe?.();
+      ipcRenderer.removeListener('devices:update', handler);
     };
-  }, []);
+  }, [dispatch]);
 
-  const updateUsbMessage = React.useCallback((deviceId: string, message: string) => {
-    setUsbMessages((prev) => ({
-      ...prev,
-      [deviceId]: message
-    }));
-  }, []);
-
-  const handleClaimUsb = async (deviceId: string) => {
-    const result = (await window.electronAPI?.claimUsbDevice(deviceId)) ?? false;
-    updateUsbMessage(deviceId, result ? 'Reserved for this instance.' : 'Already owned by another instance.');
+  const handleClaimUsb = (deviceId: string) => {
+    ipcRenderer.send('devices:claim', deviceId);
   };
 
-  const handleReleaseUsb = async (deviceId: string) => {
-    const result = (await window.electronAPI?.releaseUsbDevice(deviceId)) ?? false;
-    updateUsbMessage(deviceId, result ? 'Released and now available.' : 'Nothing to release.');
+  const handleReleaseUsb = (deviceId: string) => {
+    ipcRenderer.send('devices:release', deviceId);
   };
 
   return (
@@ -61,40 +40,21 @@ const App = () => {
       </header>
 
       <section>
-        <h2>Runtime versions</h2>
-        <ul>
-          <li>Electron: {versions?.electron ?? 'loading...'}</li>
-          <li>Chrome: {versions?.chrome ?? 'loading...'}</li>
-          <li>Node.js: {versions?.node ?? 'loading...'}</li>
-        </ul>
-      </section>
-
-      <section>
-        <h2>Instance awareness</h2>
-        <ul>
-          <li>PID: {instanceState?.selfPid ?? 'detecting...'}</li>
-          <li>Leader PID: {instanceState?.leaderPid ?? 'pending'}</li>
-          <li>Estimated connected instances: {instanceState?.estimatedCount ?? 'detecting...'}</li>
-          <li>Detected executables: {instanceState?.processCount ?? 'detecting...'}</li>
-        </ul>
-      </section>
-
-      <section>
         <h2>USB device coordination</h2>
-        {instanceState?.usbDevices?.length ? (
+        {devicesLoading && <p>Loading devices...</p>}
+        {devices.length ? (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
                 <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', paddingBottom: 4 }}>Device</th>
                 <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', paddingBottom: 4 }}>Owner</th>
                 <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', paddingBottom: 4 }}>Actions</th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', paddingBottom: 4 }}>Status</th>
               </tr>
             </thead>
             <tbody>
-              {instanceState.usbDevices.map((device) => {
-                const isOwnedBySelf = device.ownerPid === instanceState.selfPid;
-                const claimDisabled = Boolean(device.ownerPid && !isOwnedBySelf);
+              {devices.map((device) => {
+                const isOwnedBySelf = device.ownerLabel === 'This session';
+                const claimDisabled = Boolean(device.ownerLabel && !isOwnedBySelf);
                 const releaseDisabled = !isOwnedBySelf;
 
                 return (
@@ -109,7 +69,6 @@ const App = () => {
                         Release
                       </button>
                     </td>
-                    <td style={{ padding: '8px 0' }}>{usbMessages[device.id]}</td>
                   </tr>
                 );
               })}

@@ -5,6 +5,7 @@ const electronExecutable = require('electron') as string;
 const repoRoot = path.resolve(__dirname, '..');
 const electronMainPath = path.resolve(repoRoot, 'dist/main/index.js');
 const testDir = path.resolve(__dirname, 'ui');
+const playwrightReportDir = path.resolve(repoRoot, './tests/test-results/playwright-report');
 
 export default defineConfig({
   testDir,
@@ -29,6 +30,6 @@ export default defineConfig({
       }
     }
   ],
-  reporter: [['list'], ['html', { outputFolder: path.resolve(repoRoot, 'playwright-report') }]]
+  reporter: [['list'], ['html', { outputFolder: playwrightReportDir }]]
 });
 

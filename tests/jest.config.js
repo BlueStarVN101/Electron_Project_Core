@@ -10,7 +10,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
   testPathIgnorePatterns: ['<rootDir>/tests/ui/'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
-  coverageDirectory: 'coverage',
+  coverageDirectory: './tests/test-results/coverage',
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: path.resolve(__dirname, '../tsconfig.test.json') }]
   },
@@ -19,7 +19,7 @@ module.exports = {
     [
       'jest-html-reporters',
       {
-        publicPath: './test-results',
+        publicPath: './tests/test-results/Unit_Test_Report',
         filename: 'test-report.html',
         pageTitle: 'Unit Test Report',
         openReport: false,
