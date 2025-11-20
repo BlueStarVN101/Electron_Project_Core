@@ -1,11 +1,16 @@
+export type UsbDeviceState = {
+  id: string;
+  ownerPid: number | null;
+  ownerLabel: string | null;
+};
+
 export type InstanceState = {
   selfPid: number;
   leaderPid: number | null;
   estimatedCount: number;
   processCount: number;
   connectedPids: number[];
-  usbOwnerPid: number | null;
-  usbOwnerLabel: string | null;
+  usbDevices: UsbDeviceState[];
   isLeader: boolean;
   lastUpdated: number;
 };
@@ -15,7 +20,7 @@ export type InstanceStatePayload = {
   estimatedCount: number;
   processCount: number;
   connectedPids: number[];
-  usbOwnerPid: number | null;
+  usbDevices: UsbDeviceState[];
   lastUpdated: number;
 };
 

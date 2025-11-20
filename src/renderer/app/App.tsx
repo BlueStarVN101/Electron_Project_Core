@@ -5,8 +5,9 @@ import type { RuntimeVersions } from '../../shared/models/runtime';
 const App = () => {
   const [versions, setVersions] = React.useState<RuntimeVersions | null>(null);
   const [instanceState, setInstanceState] = React.useState<InstanceState | null>(null);
-  const [usbMessage, setUsbMessage] = React.useState<string>('');
+  const [usbMessages, setUsbMessages] = React.useState<Record<string, string>>({});
 
+  // Fetch static runtime versions once on mount.
   React.useEffect(() => {
     const versionInfo = window.electronAPI?.getVersions();
     if (versionInfo) {
@@ -14,6 +15,7 @@ const App = () => {
     }
   }, []);
 
+  // Listen for instance coordinator updates and populate the dashboard.
   React.useEffect(() => {
     let unsubscribe: (() => void) | undefined;
 
@@ -34,14 +36,21 @@ const App = () => {
     };
   }, []);
 
-  const handleClaimUsb = async () => {
-    const result = await window.electronAPI?.claimUsbDevice();
-    setUsbMessage(result ? 'USB device reserved for this instance.' : 'USB device already in use.');
+  const updateUsbMessage = React.useCallback((deviceId: string, message: string) => {
+    setUsbMessages((prev) => ({
+      ...prev,
+      [deviceId]: message
+    }));
+  }, []);
+
+  const handleClaimUsb = async (deviceId: string) => {
+    const result = (await window.electronAPI?.claimUsbDevice(deviceId)) ?? false;
+    updateUsbMessage(deviceId, result ? 'Reserved for this instance.' : 'Already owned by another instance.');
   };
 
-  const handleReleaseUsb = async () => {
-    const result = await window.electronAPI?.releaseUsbDevice();
-    setUsbMessage(result ? 'USB device released.' : 'Failed to release USB device.');
+  const handleReleaseUsb = async (deviceId: string) => {
+    const result = (await window.electronAPI?.releaseUsbDevice(deviceId)) ?? false;
+    updateUsbMessage(deviceId, result ? 'Released and now available.' : 'Nothing to release.');
   };
 
   return (
@@ -67,13 +76,48 @@ const App = () => {
           <li>Leader PID: {instanceState?.leaderPid ?? 'pending'}</li>
           <li>Estimated connected instances: {instanceState?.estimatedCount ?? 'detecting...'}</li>
           <li>Detected executables: {instanceState?.processCount ?? 'detecting...'}</li>
-          <li>USB owner: {instanceState?.usbOwnerLabel ?? 'Available'}</li>
         </ul>
-        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-          <button onClick={handleClaimUsb}>Claim USB</button>
-          <button onClick={handleReleaseUsb}>Release USB</button>
-        </div>
-        {usbMessage && <p style={{ marginTop: 8 }}>{usbMessage}</p>}
+      </section>
+
+      <section>
+        <h2>USB device coordination</h2>
+        {instanceState?.usbDevices?.length ? (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', paddingBottom: 4 }}>Device</th>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', paddingBottom: 4 }}>Owner</th>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', paddingBottom: 4 }}>Actions</th>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', paddingBottom: 4 }}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {instanceState.usbDevices.map((device) => {
+                const isOwnedBySelf = device.ownerPid === instanceState.selfPid;
+                const claimDisabled = Boolean(device.ownerPid && !isOwnedBySelf);
+                const releaseDisabled = !isOwnedBySelf;
+
+                return (
+                  <tr key={device.id}>
+                    <td style={{ padding: '8px 0' }}>{device.id}</td>
+                    <td style={{ padding: '8px 0' }}>{device.ownerLabel ?? 'Available'}</td>
+                    <td style={{ padding: '8px 0' }}>
+                      <button style={{ marginRight: 8 }} disabled={claimDisabled} onClick={() => handleClaimUsb(device.id)}>
+                        Claim
+                      </button>
+                      <button disabled={releaseDisabled} onClick={() => handleReleaseUsb(device.id)}>
+                        Release
+                      </button>
+                    </td>
+                    <td style={{ padding: '8px 0' }}>{usbMessages[device.id]}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        ) : (
+          <p>No USB devices are currently being tracked.</p>
+        )}
       </section>
 
       <section>

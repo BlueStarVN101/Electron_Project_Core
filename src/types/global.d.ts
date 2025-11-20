@@ -5,8 +5,8 @@ export type ElectronAPI = {
   getVersions: () => RuntimeVersions;
   getInstanceState: () => Promise<InstanceState | null>;
   onInstanceState: (callback: (state: InstanceState) => void) => () => void;
-  claimUsbDevice: () => Promise<boolean>;
-  releaseUsbDevice: () => Promise<boolean>;
+  claimUsbDevice: (deviceId: string) => Promise<boolean>;
+  releaseUsbDevice: (deviceId: string) => Promise<boolean>;
 };
 
 declare global {

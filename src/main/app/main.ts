@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, session } from 'electron';
 import * as path from 'path';
 import InstanceCoordinator from './instance-coordinator';
 import type { InstanceState } from '../../shared/models/instance';
+import { getTrackedUsbDevices } from '../preload/api/usb-devices';
 
 const isDev = process.env.NODE_ENV === 'development';
 let mainWindow: BrowserWindow | null = null;
@@ -23,7 +24,8 @@ const installDevTools = async (): Promise<void> => {
 };
 
 /**
- * Create the main renderer window and wire up lifecycle events.
+ * Create the renderer window, wire lifecycle events, and immediately push the latest
+ * instance snapshot so the UI can render counts before live events arrive.
  */
 const createMainWindow = async (): Promise<void> => {
   mainWindow = new BrowserWindow({
@@ -55,10 +57,14 @@ const createMainWindow = async (): Promise<void> => {
   }
 };
 
+/**
+ * Bridge renderer IPC calls onto the InstanceCoordinator and re-broadcast
+ * leader state changes to every BrowserWindow.
+ */
 const registerInstanceHandlers = (coordinator: InstanceCoordinator): void => {
   ipcMain.handle('instance:get-state', () => coordinator.getSnapshot());
-  ipcMain.handle('instance:claim-usb', () => coordinator.claimUsbDevice());
-  ipcMain.handle('instance:release-usb', () => coordinator.releaseUsbDevice());
+  ipcMain.handle('instance:claim-usb', (_event, deviceId: string) => coordinator.claimUsbDevice(deviceId ?? ''));
+  ipcMain.handle('instance:release-usb', (_event, deviceId: string) => coordinator.releaseUsbDevice(deviceId ?? ''));
 
   coordinator.on('state-changed', (state: InstanceState) => {
     if (mainWindow?.isDestroyed()) {
@@ -70,7 +76,8 @@ const registerInstanceHandlers = (coordinator: InstanceCoordinator): void => {
 };
 
 /**
- * Bootstraps the Electron app by installing DevTools (in dev) and creating the window.
+ * Bootstraps the Electron app by installing DevTools (in dev),
+ * initializing the InstanceCoordinator once, and creating the main window.
  */
 export const bootstrap = async (): Promise<void> => {
   if (isDev) {
@@ -80,6 +87,7 @@ export const bootstrap = async (): Promise<void> => {
   if (!instanceCoordinator) {
     instanceCoordinator = new InstanceCoordinator(app.getName());
     await instanceCoordinator.init();
+    await instanceCoordinator.setUsbDevices(getTrackedUsbDevices());
     registerInstanceHandlers(instanceCoordinator);
   }
 
