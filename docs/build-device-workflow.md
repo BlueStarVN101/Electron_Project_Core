@@ -79,8 +79,8 @@ flowchart TD
     end
 
     subgraph Tooling
-        Webpack[Webpack + Babel]
-        TSC[tsc (tsconfig.json/prod/test)]
+        Webpack["Webpack + Babel"]
+        TSC["tsc (tsconfig variants)"]
     end
 
     subgraph Outputs
