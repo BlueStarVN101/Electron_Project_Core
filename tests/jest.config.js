@@ -7,6 +7,9 @@ module.exports = {
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/tests'],
   moduleFileExtensions: ['ts', 'tsx', 'js'],
+  moduleNameMapper: {
+    '\\.(css|less|sass|scss)$': 'identity-obj-proxy'
+  },
   setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
   testPathIgnorePatterns: ['<rootDir>/tests/ui/'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],

@@ -3,6 +3,7 @@ import { ipcRenderer } from 'electron';
 import type { DeviceInfo } from '../../shared/models/device';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { selectDevicesList, selectDevicesLoading, setDevices, setDevicesLoading } from './store/devices/devices.slice';
+import './App.css';
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -10,8 +11,6 @@ const App = () => {
   const devicesLoading = useAppSelector(selectDevicesLoading);
 
   React.useEffect(() => {
-    // Kick off the initial device sync. The main process responds via `devices:update`
-    // and every subsequent update gets normalized through the Redux slice.
     dispatch(setDevicesLoading(true));
     const handler = (_event: Electron.IpcRendererEvent, devicesList: DeviceInfo[]) => {
       dispatch(setDevices(devicesList));
@@ -32,23 +31,69 @@ const App = () => {
     ipcRenderer.send('devices:release', deviceId);
   };
 
+  const totalDevices = devices.length;
+  const availableDevices = devices.filter((device) => !device.ownerLabel).length;
+  const ownedBySession = devices.filter((device) => device.ownerLabel === 'This session').length;
+  const reservedDevices = totalDevices - availableDevices;
+  const pillClass = `pill ${devicesLoading ? 'pill--syncing' : 'pill--live'}`;
+
+  const getStatusClass = (device: DeviceInfo) => {
+    if (!device.ownerLabel) return 'status-chip status--available';
+    if (device.ownerLabel === 'This session') return 'status-chip status--self';
+    return 'status-chip status--busy';
+  };
+
+  const getOwnerLabel = (device: DeviceInfo) => {
+    if (!device.ownerLabel) return 'Available';
+    if (device.ownerLabel === 'This session') return 'Reserved by you';
+    return device.ownerLabel;
+  };
+
   return (
-    <main style={{ fontFamily: 'system-ui, sans-serif', padding: 24 }}>
-      <header>
-        <h1>All-in-one Electron starter.</h1>
-        <p>You're now running a typed React renderer with a secure preload bridge.</p>
+    <div className="app-shell">
+      <header className="app-hero">
+        <div className="hero-copy">
+          <span className="eyebrow">Device orchestration</span>
+          <h1>USB Device Control Center</h1>
+          <p className="hero-subtitle">Monitor and moderate how each desktop instance interacts with shared USB hardware. Claim devices when you need them and release with a click.</p>
+        </div>
+
+        <div className="stats-grid">
+          <article className="stats-card">
+            <p className="stats-label">Total devices</p>
+            <p className="stats-value">{totalDevices}</p>
+          </article>
+          <article className="stats-card">
+            <p className="stats-label">Available</p>
+            <p className="stats-value">{availableDevices}</p>
+          </article>
+          <article className="stats-card">
+            <p className="stats-label">Reserved</p>
+            <p className="stats-value">{reservedDevices}</p>
+          </article>
+          <article className="stats-card">
+            <p className="stats-label">Owned by this session</p>
+            <p className="stats-value">{ownedBySession}</p>
+          </article>
+        </div>
       </header>
 
-      <section>
-        <h2>USB device coordination</h2>
-        {devicesLoading && <p>Loading devices...</p>}
+      <section className="card">
+        <div className="section-header">
+          <div>
+            <span className="eyebrow">Live overview</span>
+            <h2>USB device coordination</h2>
+          </div>
+          <span className={pillClass}>{devicesLoading ? 'Syncing…' : 'Live updates'}</span>
+        </div>
+
         {devices.length ? (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table className="device-table">
             <thead>
               <tr>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', paddingBottom: 4 }}>Device</th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', paddingBottom: 4 }}>Owner</th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', paddingBottom: 4 }}>Actions</th>
+                <th>Device</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -59,13 +104,15 @@ const App = () => {
 
                 return (
                   <tr key={device.id}>
-                    <td style={{ padding: '8px 0' }}>{device.id}</td>
-                    <td style={{ padding: '8px 0' }}>{device.ownerLabel ?? 'Available'}</td>
-                    <td style={{ padding: '8px 0' }}>
-                      <button style={{ marginRight: 8 }} disabled={claimDisabled} onClick={() => handleClaimUsb(device.id)}>
+                    <td>{device.id}</td>
+                    <td>
+                      <span className={getStatusClass(device)}>{getOwnerLabel(device)}</span>
+                    </td>
+                    <td>
+                      <button className="btn btn--primary" disabled={claimDisabled} onClick={() => handleClaimUsb(device.id)}>
                         Claim
                       </button>
-                      <button disabled={releaseDisabled} onClick={() => handleReleaseUsb(device.id)}>
+                      <button className="btn btn--ghost" disabled={releaseDisabled} onClick={() => handleReleaseUsb(device.id)}>
                         Release
                       </button>
                     </td>
@@ -79,14 +126,16 @@ const App = () => {
         )}
       </section>
 
-      <section>
-        <h2>Next steps</h2>
-        <p>
-          Start editing <code>src/renderer/app/App.tsx</code> or add new components under <code>src/renderer/</code>. The renderer rebuilds automatically while{' '}
-          <code>npm run dev</code> is running.
-        </p>
+      <section className="card info-card">
+        <span className="eyebrow">Next steps</span>
+        <h2>Where to go from here?</h2>
+        <ul>
+          <li>Wire real USB discovery logic inside <code>main.ts</code> and broadcast updates when hardware changes.</li>
+          <li>Expand Redux with additional slices if you need per-device metadata or history.</li>
+          <li>Use the Playwright + Jest setups under <code>tests/</code> to validate new flows.</li>
+        </ul>
       </section>
-    </main>
+    </div>
   );
 };
 

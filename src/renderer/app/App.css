@@ -1,0 +1,234 @@
+:root {
+  color-scheme: dark;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #050816;
+  color: #f1f5f9;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 32px;
+  background: radial-gradient(circle at top left, rgba(14, 165, 233, 0.15), transparent 45%),
+    radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.15), transparent 45%),
+    #050816;
+}
+
+.app-hero {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(236, 72, 153, 0.1));
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 24px;
+  padding: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.45);
+  margin-bottom: 32px;
+}
+
+.hero-copy {
+  flex: 1;
+  min-width: 240px;
+}
+
+.hero-copy h1 {
+  margin: 0;
+  font-size: clamp(2rem, 3vw, 2.75rem);
+}
+
+.hero-subtitle {
+  margin-top: 12px;
+  color: #cbd5f5;
+  max-width: 520px;
+  line-height: 1.5;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.7rem;
+  color: #a5b4fc;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.stats-grid {
+  flex: 1;
+  min-width: 240px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.stats-card {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.stats-label {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #94a3b8;
+}
+
+.stats-value {
+  margin: 8px 0 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.card {
+  background: rgba(2, 6, 23, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 24px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 12px 35px rgba(2, 6, 23, 0.4);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pill {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pill--live {
+  background: rgba(16, 185, 129, 0.15);
+  color: #22c55e;
+}
+
+.pill--syncing {
+  background: rgba(251, 191, 36, 0.15);
+  color: #facc15;
+}
+
+.device-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.device-table th,
+.device-table td {
+  text-align: left;
+  padding: 14px 12px;
+}
+
+.device-table thead th {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.device-table tbody tr {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.device-table tbody tr:hover {
+  background: rgba(148, 163, 184, 0.05);
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.status-chip::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status--available {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+.status--available::before {
+  background: #22c55e;
+}
+
+.status--self {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+.status--self::before {
+  background: #3b82f6;
+}
+
+.status--busy {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+.status--busy::before {
+  background: #ef4444;
+}
+
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  margin-right: 8px;
+}
+
+.btn:last-child {
+  margin-right: 0;
+}
+
+.btn--primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+}
+
+.btn--ghost {
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: #e2e8f0;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.info-card {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.2), rgba(14, 165, 233, 0.15));
+  border-color: rgba(129, 140, 248, 0.35);
+}
+
+.info-card ul {
+  margin: 12px 0 0 20px;
+  color: #e2e8f0;
+  line-height: 1.6;
+}
+
