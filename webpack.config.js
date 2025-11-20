@@ -1,7 +1,11 @@
 const path = require('path');
 
 module.exports = {
-  devtool: process.env.NODE_ENV === 'production' ? false : 'source-map', 
+  cache: {
+    type: 'filesystem',
+    cacheDirectory: path.resolve(__dirname, 'node_modules/.cache/webpack')
+  },
+  devtool: process.env.NODE_ENV === 'production' ? false : 'source-map',
   mode: process.env.NODE_ENV || 'development',
   entry: './src/renderer/app/renderer.tsx',
   module: {
