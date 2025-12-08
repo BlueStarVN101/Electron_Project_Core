@@ -12,7 +12,7 @@ module.exports = {
     rules: [
       {
         test: /\.(ts|tsx)$/,
-        use: 'babel-loader',
+        use: 'ts-loader',
         exclude: /node_modules/
       },
       {
